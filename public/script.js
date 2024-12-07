@@ -3,14 +3,15 @@ const resultDiv = document.getElementById('result');
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
-  const long_url = document.getElementById('long_url').value;
+  const searchType = document.getElementById('searchType').value;
+  const searchValue = document.getElementById('searchValue').value;
 
-  fetch('/search', { 
+  fetch('/search', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ long_url })
+    body: JSON.stringify({ searchType, searchValue })
   })
   .then(response => response.json())
   .then(data => {
@@ -19,7 +20,6 @@ form.addEventListener('submit', (event) => {
       resultDiv.innerHTML += `<p>${data.error}</p>`;
     } else {
       const table = document.createElement('table');
-      // Tạo header cho bảng
       const headerRow = table.insertRow();
       if (data.length > 0) {
         Object.keys(data[0]).forEach(key => {
@@ -27,7 +27,6 @@ form.addEventListener('submit', (event) => {
           headerCell.textContent = key;
         });
       }
-      // Thêm dữ liệu vào bảng
       data.forEach(row => {
         const dataRow = table.insertRow();
         Object.values(row).forEach(value => {

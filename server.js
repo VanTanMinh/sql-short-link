@@ -3,38 +3,53 @@ const mysql = require('mysql');
 const app = express();
 const port = 3000;
 
-// Thay đổi thông tin kết nối cơ sở dữ liệu cho phù hợp
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'server',
-  password: 'Tanminh2009@#',
-  database: 'server'
+  user: 'server', // Thay đổi username cho phù hợp
+  password: 'Tanminh2009@#',  // Thay đổi password cho phù hợp
+  database: 'server' // Thay đổi tên database cho phù hợp
 });
 
 db.connect((err) => {
+  if (err) {
+    console.error('Lỗi kết nối cơ sở dữ liệu:', err);
+    return;
+  }
+  console.log('Kết nối cơ sở dữ liệu thành công!');
+});
+
+app.use(express.static('public'));
+app.use(express.json());
+
+app.post('/search', (req, res) => {
+  const searchType = req.body.searchType;
+  const searchValue = req.body.searchValue;
+
+  let query;
+  let values;
+
+  if (searchType === "id") {
+    const numId = parseInt(searchValue);
+    if (isNaN(numId)) {
+      return res.json({ error: "ID phải là số" });
+    }
+    query = `SELECT * FROM links WHERE id = ?`;
+    values = [numId];
+  } else {
+    query = `SELECT * FROM links WHERE ${searchType} LIKE ?`;
+    values = [`%${searchValue}%`];
+  }
+
+  db.query(query, values, (err, result) => {
     if (err) {
-      console.error('Lỗi kết nối cơ sở dữ liệu:', err);
+      console.error('Lỗi truy vấn:', err);
+      res.json({ error: err.message });
       return;
     }
-    console.log('Kết nối cơ sở dữ liệu thành công!');
+    res.json(result);
   });
-  
-  app.use(express.static('public'));
-  app.use(express.json());
-  
-  app.post('/search', (req, res) => {
-    const long_url = req.body.long_url;
-    const query = `SELECT * FROM links WHERE long_url LIKE ?`;
-    db.query(query, [`%${long_url}%`], (err, result) => {
-      if (err) {
-        console.error('Lỗi truy vấn:', err);
-        res.json({ error: err.message });
-        return;
-      }
-      res.json(result);
-    });
-  });
-  
-  app.listen(port, () => {
-    console.log(`Server đang chạy tại http://localhost:${port}`);
-  });
+});
+
+app.listen(port, () => {
+  console.log(`Server đang chạy tại http://localhost:${port}`);
+});

@@ -6,8 +6,17 @@
 <body>
   <h1>Tìm kiếm link</h1>
   <form id="linkForm">
-    <label for="long_url">Nhập đường link:</label>
-    <input type="text" id="long_url" name="long_url"><br><br>
+    <label for="searchType">Tìm kiếm theo:</label>
+    <select id="searchType" name="searchType">
+      <option value="short_code">Short Code</option>
+      <option value="long_url">Long URL</option>
+      <option value="id">ID</option>
+      <option value="name">Name</option>
+    </select><br><br>
+
+    <label for="searchValue">Giá trị tìm kiếm:</label>
+    <input type="text" id="searchValue" name="searchValue"><br><br>
+
     <button type="submit">Tìm kiếm</button>
   </form>
   <div id="result"></div>
